@@ -142,8 +142,8 @@
     <div class="grid-container" id="buildsContainer"></div>
 
     <script>
-        // COLOQUE AQUI O LINK CSV GERADO NO PASSO 1
-        const GOOGLE_SHEET_CSV_URL = "SUA_URL_DO_CSV_AQUI";
+        // O seu link CSV gerado no Google Sheets
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9UXKRHsFz1G2hrPf591ArVykTdhaG5oU93Jnb43UjK0QIVx_AL6g5lClynkEXPAZhOkyZ2g9B8GYH/pub?output=csv";
 
         let allClasses = [];
 
@@ -177,7 +177,6 @@
                 const card = document.createElement('div');
                 card.className = 'class-card';
 
-                // Usando a notação de colchetes com os exatos nomes do seu cabeçalho
                 const className = cls['Class'] || 'Desconhecida';
                 const classEnh = cls['Class Enhan'] || '-';
                 const weapon = cls['Weapon'] || '-';
@@ -204,7 +203,7 @@
             });
         }
 
-        // Sistema de busca atualizado para olhar as novas colunas
+        // Sistema de busca
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             
