@@ -13,6 +13,7 @@
             --card-bg: #2d2d3f;
             --text-color: #e0e0e0;
             --gold: #d4af37;
+            --gold-hover: #b5952f;
             --border-radius: 8px;
         }
 
@@ -27,12 +28,37 @@
         header {
             text-align: center;
             margin-bottom: 30px;
+            position: relative;
         }
 
         h1 {
             color: var(--gold);
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .header-actions {
+            margin-top: 15px;
+        }
+
+        /* Estilo do Botão de Sugestão */
+        .btn-suggest {
+            background-color: var(--gold);
+            color: #111;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            text-transform: uppercase;
+        }
+
+        .btn-suggest:hover {
+            background-color: var(--gold-hover);
+            transform: scale(1.05);
         }
 
         .search-container {
@@ -125,6 +151,52 @@
             font-size: 1.2em;
             color: var(--gold);
         }
+
+        /* Estilos do Modal (Janela Flutuante) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 650px;
+            height: 80vh;
+            border-radius: var(--border-radius);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background-color: var(--gold);
+            color: #111;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .modal-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: var(--border-radius);
+        }
     </style>
 </head>
 <body>
@@ -132,6 +204,9 @@
     <header>
         <h1>AQW Class Builds</h1>
         <p>Base Comunitária de Encantamentos</p>
+        <div class="header-actions">
+            <button class="btn-suggest" onclick="openModal()">Sugerir uma Build</button>
+        </div>
     </header>
 
     <div class="search-container">
@@ -141,8 +216,17 @@
     <div id="loading" class="loading">Invocando dados da planilha...</div>
     <div class="grid-container" id="buildsContainer"></div>
 
+    <!-- Estrutura do Modal -->
+    <div class="modal-overlay" id="suggestModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal(event)">X</button>
+            <!-- COLE O LINK DO SEU GOOGLE FORMS NO "src" ABAIXO -->
+            <iframe class="modal-iframe" src="COLE_O_LINK_DO_SEU_FORMS_AQUI">Carregando formulário...</iframe>
+        </div>
+    </div>
+
     <script>
-        // O seu link CSV gerado no Google Sheets
+        // O SEU LINK CSV PRINCIPAL
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9UXKRHsFz1G2hrPf591ArVykTdhaG5oU93Jnb43UjK0QIVx_AL6g5lClynkEXPAZhOkyZ2g9B8GYH/pub?output=csv";
 
         let allClasses = [];
@@ -152,7 +236,6 @@
                 download: true,
                 header: true,
                 complete: function(results) {
-                    // Filtra garantindo que a coluna 'Class' não esteja vazia
                     allClasses = results.data.filter(row => row['Class'] && row['Class'].trim() !== "");
                     document.getElementById('loading').style.display = 'none';
                     renderCards(allClasses);
@@ -187,14 +270,12 @@
 
                 card.innerHTML = `
                     <h2 class="class-title">${className}</h2>
-                    
                     <ul class="enhancement-list">
                         <li><strong>Class:</strong> ${classEnh}</li>
                         <li><strong>Weapon:</strong> ${weapon}</li>
                         <li><strong>Helm:</strong> ${helm}</li>
                         <li><strong>Cape:</strong> ${cape}</li>
                     </ul>
-
                     ${obs ? `<div class="notes">💡 ${obs}</div>` : ''}
                     ${author ? `<div class="author">👤 Autor: ${author}</div>` : ''}
                 `;
@@ -203,17 +284,26 @@
             });
         }
 
-        // Sistema de busca
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            
             const filteredClasses = allClasses.filter(cls => {
                 const searchString = `${cls['Class']} ${cls['Observação']} ${cls['Autor']}`.toLowerCase();
                 return searchString.includes(searchTerm);
             });
-
             renderCards(filteredClasses);
         });
+
+        // Funções do Modal
+        function openModal() {
+            document.getElementById('suggestModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Evita que o site role por trás do modal
+        }
+
+        function closeModal(event) {
+            if(event) event.stopPropagation();
+            document.getElementById('suggestModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Devolve a rolagem do site
+        }
     </script>
 </body>
 </html>
