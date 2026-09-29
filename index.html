@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQW Builds & Encantamentos</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #1a1a24;
+            --card-bg: #2d2d3f;
+            --text-color: #e0e0e0;
+            --gold: #d4af37;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            border: 1px solid #444;
+            background-color: #111;
+            color: white;
+            font-size: 16px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .class-card {
+            background-color: var(--card-bg);
+            border-left: 5px solid var(--gold);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .class-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .class-title {
+            font-size: 1.5em;
+            color: var(--gold);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .enhancement-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            flex-grow: 1;
+        }
+
+        .enhancement-list li {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .enhancement-list strong {
+            color: #aaa;
+            display: inline-block;
+            width: 70px;
+        }
+
+        .notes {
+            background-color: #313145;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: #ccc;
+            margin-bottom: 15px;
+            border-left: 3px solid #666;
+        }
+
+        .author {
+            font-size: 0.8em;
+            color: #888;
+            text-align: right;
+            margin-top: auto;
+            border-top: 1px dashed #444;
+            padding-top: 8px;
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AQW Class Builds</h1>
+        <p>Base Comunitária de Encantamentos</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por classe, autor ou observação...">
+    </div>
+
+    <div id="loading" class="loading">Invocando dados da planilha...</div>
+    <div class="grid-container" id="buildsContainer"></div>
+
+    <script>
+        // COLOQUE AQUI O LINK CSV GERADO NO PASSO 1
+        const GOOGLE_SHEET_CSV_URL = "SUA_URL_DO_CSV_AQUI";
+
+        let allClasses = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            Papa.parse(GOOGLE_SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    // Filtra garantindo que a coluna 'Class' não esteja vazia
+                    allClasses = results.data.filter(row => row['Class'] && row['Class'].trim() !== "");
+                    document.getElementById('loading').style.display = 'none';
+                    renderCards(allClasses);
+                },
+                error: function(err) {
+                    document.getElementById('loading').innerText = "Erro ao carregar os dados. Verifique o link da planilha.";
+                    console.error("Erro no PapaParse:", err);
+                }
+            });
+        });
+
+        function renderCards(classesData) {
+            const container = document.getElementById('buildsContainer');
+            container.innerHTML = ""; 
+
+            if (classesData.length === 0) {
+                container.innerHTML = "<p style='text-align:center; grid-column: 1/-1;'>Nenhuma classe encontrada.</p>";
+                return;
+            }
+
+            classesData.forEach(cls => {
+                const card = document.createElement('div');
+                card.className = 'class-card';
+
+                // Usando a notação de colchetes com os exatos nomes do seu cabeçalho
+                const className = cls['Class'] || 'Desconhecida';
+                const classEnh = cls['Class Enhan'] || '-';
+                const weapon = cls['Weapon'] || '-';
+                const helm = cls['Helm'] || '-';
+                const cape = cls['Cape'] || '-';
+                const obs = cls['Observação'] || '';
+                const author = cls['Autor'] || '';
+
+                card.innerHTML = `
+                    <h2 class="class-title">${className}</h2>
+                    
+                    <ul class="enhancement-list">
+                        <li><strong>Class:</strong> ${classEnh}</li>
+                        <li><strong>Weapon:</strong> ${weapon}</li>
+                        <li><strong>Helm:</strong> ${helm}</li>
+                        <li><strong>Cape:</strong> ${cape}</li>
+                    </ul>
+
+                    ${obs ? `<div class="notes">💡 ${obs}</div>` : ''}
+                    ${author ? `<div class="author">👤 Autor: ${author}</div>` : ''}
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Sistema de busca atualizado para olhar as novas colunas
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            const filteredClasses = allClasses.filter(cls => {
+                const searchString = `${cls['Class']} ${cls['Observação']} ${cls['Autor']}`.toLowerCase();
+                return searchString.includes(searchTerm);
+            });
+
+            renderCards(filteredClasses);
+        });
+    </script>
+</body>
+</html>
