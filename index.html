@@ -38,11 +38,8 @@
             margin-bottom: 5px;
         }
 
-        .header-actions {
-            margin-top: 15px;
-        }
+        .header-actions { margin-top: 15px; }
 
-        /* Estilo do Botão de Sugestão */
         .btn-suggest {
             background-color: var(--gold);
             color: #111;
@@ -52,7 +49,7 @@
             font-weight: bold;
             border-radius: var(--border-radius);
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: 0.2s;
             text-transform: uppercase;
         }
 
@@ -91,22 +88,31 @@
             border-radius: var(--border-radius);
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
             display: flex;
             flex-direction: column;
-        }
-
-        .class-card:hover {
-            transform: translateY(-5px);
         }
 
         .class-title {
             font-size: 1.5em;
             color: var(--gold);
             margin-top: 0;
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* Reduzido um pouco para dar espaço ao selo */
             border-bottom: 1px solid #444;
             padding-bottom: 5px;
+        }
+
+        /* ESTILO DO SELO (BADGE) DE FUNÇÃO */
+        .role-badge {
+            display: inline-block;
+            background-color: #4a4a6a;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            align-self: flex-start;
         }
 
         .enhancement-list {
@@ -116,16 +122,8 @@
             flex-grow: 1;
         }
 
-        .enhancement-list li {
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-
-        .enhancement-list strong {
-            color: #aaa;
-            display: inline-block;
-            width: 70px;
-        }
+        .enhancement-list li { margin-bottom: 8px; }
+        .enhancement-list strong { color: #aaa; display: inline-block; width: 70px; }
 
         .notes {
             background-color: #313145;
@@ -146,13 +144,7 @@
             padding-top: 8px;
         }
         
-        .loading {
-            text-align: center;
-            font-size: 1.2em;
-            color: var(--gold);
-        }
-
-        /* Estilos do Modal (Janela Flutuante) */
+        /* ESTILOS DO MODAL E FORMULÁRIO NATIVO */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -166,37 +158,70 @@
         .modal-content {
             background-color: var(--card-bg);
             width: 90%;
-            max-width: 650px;
-            height: 80vh;
+            max-width: 500px;
             border-radius: var(--border-radius);
+            padding: 30px;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-close {
             position: absolute;
-            top: -15px;
-            right: -15px;
-            background-color: var(--gold);
-            color: #111;
+            top: 10px;
+            right: 15px;
+            background: none;
+            color: #aaa;
             border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 24px;
             cursor: pointer;
-            z-index: 1001;
         }
 
-        .modal-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: var(--border-radius);
+        .modal-content h2 {
+            color: var(--gold);
+            margin-top: 0;
         }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-size: 0.9em;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #111;
+            color: white;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        #submitStatus {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-success { background-color: #2b542c; color: #a3d9a5; }
+        .status-loading { background-color: #665500; color: #ffd700; }
+        .status-error { background-color: #542b2b; color: #d9a3a3; }
     </style>
 </head>
 <body>
@@ -210,25 +235,63 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Buscar por classe, autor ou observação...">
+        <input type="text" id="searchInput" placeholder="Buscar por classe, função ou autor...">
     </div>
 
-    <div id="loading" class="loading">Invocando dados da planilha...</div>
+    <div id="loading" style="text-align: center; color: var(--gold);">Invocando dados...</div>
     <div class="grid-container" id="buildsContainer"></div>
 
-    <!-- Estrutura do Modal -->
+    <!-- FORMULÁRIO NATIVO -->
     <div class="modal-overlay" id="suggestModal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeModal(event)">X</button>
-            <!-- COLE O LINK DO SEU GOOGLE FORMS NO "src" ABAIXO -->
-            <iframe class="modal-iframe" src="COLE_O_LINK_DO_SEU_FORMS_AQUI">Carregando formulário...</iframe>
+            <button class="modal-close" onclick="closeModal(event)">&times;</button>
+            <h2>Enviar Nova Build</h2>
+            
+            <form id="buildForm" onsubmit="submitForm(event)">
+                <div class="form-group">
+                    <label>Classe (Ex: Void Highlord)</label>
+                    <input type="text" id="input_class" required>
+                </div>
+                
+                <!-- NOVO CAMPO: FUNÇÃO -->
+                <div class="form-group">
+                    <label>Função (Ex: Farm, Solo, Suporte, PvP)</label>
+                    <input type="text" id="input_funcao" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Encantamento da Classe (Ex: Luck)</label>
+                    <input type="text" id="input_classEnh" required>
+                </div>
+                <div class="form-group">
+                    <label>Arma (Ex: Valiance)</label>
+                    <input type="text" id="input_weapon" required>
+                </div>
+                <div class="form-group">
+                    <label>Capuz (Ex: Forge)</label>
+                    <input type="text" id="input_helm" required>
+                </div>
+                <div class="form-group">
+                    <label>Capa (Ex: Lament)</label>
+                    <input type="text" id="input_cape" required>
+                </div>
+                <div class="form-group">
+                    <label>Observação / Dica de uso</label>
+                    <textarea id="input_obs" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Seu Nick/Nome</label>
+                    <input type="text" id="input_author" required>
+                </div>
+                
+                <button type="submit" class="btn-suggest" style="width: 100%;">Enviar para Análise</button>
+                <div id="submitStatus"></div>
+            </form>
         </div>
     </div>
 
     <script>
-        // O SEU LINK CSV PRINCIPAL
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9UXKRHsFz1G2hrPf591ArVykTdhaG5oU93Jnb43UjK0QIVx_AL6g5lClynkEXPAZhOkyZ2g9B8GYH/pub?output=csv";
-
         let allClasses = [];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -239,10 +302,6 @@
                     allClasses = results.data.filter(row => row['Class'] && row['Class'].trim() !== "");
                     document.getElementById('loading').style.display = 'none';
                     renderCards(allClasses);
-                },
-                error: function(err) {
-                    document.getElementById('loading').innerText = "Erro ao carregar os dados. Verifique o link da planilha.";
-                    console.error("Erro no PapaParse:", err);
                 }
             });
         });
@@ -250,7 +309,7 @@
         function renderCards(classesData) {
             const container = document.getElementById('buildsContainer');
             container.innerHTML = ""; 
-
+            
             if (classesData.length === 0) {
                 container.innerHTML = "<p style='text-align:center; grid-column: 1/-1;'>Nenhuma classe encontrada.</p>";
                 return;
@@ -259,50 +318,89 @@
             classesData.forEach(cls => {
                 const card = document.createElement('div');
                 card.className = 'class-card';
-
-                const className = cls['Class'] || 'Desconhecida';
-                const classEnh = cls['Class Enhan'] || '-';
-                const weapon = cls['Weapon'] || '-';
-                const helm = cls['Helm'] || '-';
-                const cape = cls['Cape'] || '-';
-                const obs = cls['Observação'] || '';
-                const author = cls['Autor'] || '';
+                
+                // Resgata a Função da planilha (se estiver vazio, exibe 'Geral')
+                const funcao = cls['Função'] || 'Geral';
 
                 card.innerHTML = `
-                    <h2 class="class-title">${className}</h2>
+                    <h2 class="class-title">${cls['Class']}</h2>
+                    
+                    <!-- Selo/Badge de Função -->
+                    <div class="role-badge">${funcao}</div>
+
                     <ul class="enhancement-list">
-                        <li><strong>Class:</strong> ${classEnh}</li>
-                        <li><strong>Weapon:</strong> ${weapon}</li>
-                        <li><strong>Helm:</strong> ${helm}</li>
-                        <li><strong>Cape:</strong> ${cape}</li>
+                        <li><strong>Class:</strong> ${cls['Class Enhan'] || '-'}</li>
+                        <li><strong>Weapon:</strong> ${cls['Weapon'] || '-'}</li>
+                        <li><strong>Helm:</strong> ${cls['Helm'] || '-'}</li>
+                        <li><strong>Cape:</strong> ${cls['Cape'] || '-'}</li>
                     </ul>
-                    ${obs ? `<div class="notes">💡 ${obs}</div>` : ''}
-                    ${author ? `<div class="author">👤 Autor: ${author}</div>` : ''}
+                    ${cls['Observação'] ? \`<div class="notes">💡 ${cls['Observação']}</div>\` : ''}
+                    ${cls['Autor'] ? \`<div class="author">👤 Autor: ${cls['Autor']}</div>\` : ''}
                 `;
-                
                 container.appendChild(card);
             });
         }
 
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            const filteredClasses = allClasses.filter(cls => {
-                const searchString = `${cls['Class']} ${cls['Observação']} ${cls['Autor']}`.toLowerCase();
-                return searchString.includes(searchTerm);
-            });
-            renderCards(filteredClasses);
+            const filtered = allClasses.filter(cls => 
+                // Adicionada a 'Função' na pesquisa
+                `${cls['Class']} ${cls['Função']} ${cls['Observação']} ${cls['Autor']}`.toLowerCase().includes(searchTerm)
+            );
+            renderCards(filtered);
         });
 
-        // Funções do Modal
         function openModal() {
             document.getElementById('suggestModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Evita que o site role por trás do modal
+            document.body.style.overflow = 'hidden';
+            document.getElementById('submitStatus').style.display = 'none';
         }
 
         function closeModal(event) {
             if(event) event.stopPropagation();
             document.getElementById('suggestModal').style.display = 'none';
-            document.body.style.overflow = 'auto'; // Devolve a rolagem do site
+            document.body.style.overflow = 'auto';
+        }
+
+        function submitForm(event) {
+            event.preventDefault(); 
+            
+            const statusDiv = document.getElementById('submitStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status-loading';
+            statusDiv.innerText = 'Enviando sugestão...';
+
+            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScfsZdbDEOtq1xcbzej_SN0WoGiecnGia710JKdpUb6EpjbYA/formResponse";
+
+            const formData = new URLSearchParams();
+            
+            // ⚠️ ATENÇÃO AQUI: Substitua pelos entry.IDs que você descobriu!
+            formData.append("entry.111111111", document.getElementById('input_class').value);
+            formData.append("entry.NOVO_ID_AQUI", document.getElementById('input_funcao').value); // ID do novo campo de Função
+            formData.append("entry.222222222", document.getElementById('input_classEnh').value);
+            formData.append("entry.333333333", document.getElementById('input_weapon').value);
+            formData.append("entry.444444444", document.getElementById('input_helm').value);
+            formData.append("entry.555555555", document.getElementById('input_cape').value);
+            formData.append("entry.666666666", document.getElementById('input_obs').value);
+            formData.append("entry.777777777", document.getElementById('input_author').value);
+
+            fetch(formURL, {
+                method: "POST",
+                mode: "no-cors", 
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData
+            }).then(() => {
+                statusDiv.className = 'status-success';
+                statusDiv.innerText = 'Build enviada com sucesso! Ela será analisada.';
+                document.getElementById('buildForm').reset();
+                setTimeout(() => closeModal(), 3000); 
+            }).catch(error => {
+                statusDiv.className = 'status-error';
+                statusDiv.innerText = 'Erro de conexão. Tente novamente.';
+                console.error('Erro:', error);
+            });
         }
     </script>
 </body>
