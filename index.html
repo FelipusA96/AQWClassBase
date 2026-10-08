@@ -1,409 +1,1266 @@
+
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQW Builds & Encantamentos</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
-    <style>
-        :root {
-            --bg-color: #1a1a24;
-            --card-bg: #2d2d3f;
-            --text-color: #e0e0e0;
-            --gold: #d4af37;
-            --gold-hover: #b5952f;
-            --border-radius: 8px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#131521">
+  <meta name="description" content="Catálogo comunitário de builds e encantamentos para AdventureQuest Worlds.">
+  <title>AQW Builds | Biblioteca Comunitária</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #11131d;
+      --surface: #1d2030;
+      --surface2: #262a3d;
+      --edge: #3b4056;
+      --text: #f1f0f5;
+      --muted: #afb3c6;
+      --gold: #e9bd59;
+      --gold-light: #ffda83;
+      --bad: #ff9b9b;
+      --good: #92dfbe;
+      --radius: 16px;
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            position: relative;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        h1 {
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
+    html {
+      scroll-behavior: smooth;
+    }
 
-        .header-actions { margin-top: 15px; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(
+          ellipse 65% 35% at 50% -6%,
+          #343047 0,
+          transparent 100%
+        ),
+        var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
 
-        .btn-suggest {
-            background-color: var(--gold);
-            color: #111;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: 0.2s;
-            text-transform: uppercase;
-        }
+    button, input, select, textarea {
+      font: inherit;
+    }
 
-        .btn-suggest:hover {
-            background-color: var(--gold-hover);
-            transform: scale(1.05);
-        }
+    button {
+      cursor: pointer;
+    }
 
-        .search-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
 
-        #searchInput {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px;
-            border-radius: var(--border-radius);
-            border: 1px solid #444;
-            background-color: #111;
-            color: white;
-            font-size: 16px;
-        }
+    :focus-visible {
+      outline: 3px solid var(--gold-light);
+      outline-offset: 3px;
+    }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    .shell {
+      width: min(1180px, calc(100% - 36px));
+      margin: auto;
+    }
 
-        .class-card {
-            background-color: var(--card-bg);
-            border-left: 5px solid var(--gold);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-        }
+    /* CABEÇALHO */
 
-        .class-title {
-            font-size: 1.5em;
-            color: var(--gold);
-            margin-top: 0;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #444;
-            padding-bottom: 5px;
-        }
+    .topbar {
+      border-bottom: 1px solid #ffffff16;
+      background: #131521cc;
+      backdrop-filter: blur(12px);
+    }
 
-        .role-badge {
-            display: inline-block;
-            background-color: #4a4a6a;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: white;
-            text-transform: uppercase;
-            align-self: flex-start;
-        }
+    .topbar-inner {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
 
-        .enhancement-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 15px 0;
-            flex-grow: 1;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
 
-        .enhancement-list li { margin-bottom: 8px; }
-        .enhancement-list strong { color: #aaa; display: inline-block; width: 70px; }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #a27d32;
+      background: #4a3928;
+      border-radius: 12px;
+      font-size: 24px;
+    }
 
-        .notes {
-            background-color: #313145;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            color: #ccc;
-            margin-bottom: 15px;
-            border-left: 3px solid #666;
-        }
+    .brand strong {
+      display: block;
+      letter-spacing: .07em;
+      color: var(--gold-light);
+    }
 
-        .author {
-            font-size: 0.8em;
-            color: #888;
-            text-align: right;
-            margin-top: auto;
-            border-top: 1px dashed #444;
-            padding-top: 8px;
-        }
-        
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
 
-        .modal-content {
-            background-color: var(--card-bg);
-            width: 90%;
-            max-width: 500px;
-            border-radius: var(--border-radius);
-            padding: 30px;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+    /* BOTÕES */
 
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            color: #aaa;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
+    .btn {
+      border: 1px solid var(--edge);
+      border-radius: 11px;
+      padding: 10px 15px;
+      background: var(--surface2);
+      color: var(--text);
+      font-weight: 650;
+      transition: background .15s, transform .15s;
+    }
 
-        .modal-content h2 {
-            color: var(--gold);
-            margin-top: 0;
-        }
+    .btn:hover:not(:disabled) {
+      background: #34394f;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .btn-primary {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #20190e;
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #ccc;
-            font-size: 0.9em;
-        }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--gold-light);
+    }
 
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            background-color: #111;
-            color: white;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
+    .btn-quiet {
+      background: transparent;
+    }
 
-        .form-group textarea {
-            resize: vertical;
-            height: 80px;
-        }
+    .btn-small {
+      padding: 7px 11px;
+      font-size: 13px;
+    }
 
-        #submitStatus {
-            display: none;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-        }
+    .btn-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-        .status-success { background-color: #2b542c; color: #a3d9a5; }
-        .status-loading { background-color: #665500; color: #ffd700; }
-        .status-error { background-color: #542b2b; color: #d9a3a3; }
-    </style>
+    /* ÁREA PRINCIPAL */
+
+    .hero {
+      padding: 58px 0 32px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: .18em;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 58px);
+      letter-spacing: -.04em;
+      line-height: 1.1;
+      margin: 14px 0;
+    }
+
+    h1 span {
+      color: var(--gold);
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto;
+      color: var(--muted);
+    }
+
+    /* FILTROS */
+
+    .toolbar {
+      display: grid;
+      grid-template-columns:
+        minmax(240px, 2fr)
+        minmax(160px, 1fr)
+        minmax(160px, 1fr)
+        auto;
+      gap: 12px;
+      align-items: end;
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: #10121d;
+      border: 1px solid var(--edge);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 12px;
+      min-height: 45px;
+    }
+
+    .field textarea {
+      min-height: 94px;
+      resize: vertical;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #858ba4;
+    }
+
+    /* CATÁLOGO */
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 26px 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    #statusLine {
+      min-height: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      padding-bottom: 55px;
+    }
+
+    .card {
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 12px 24px #00000018;
+      transition: transform .15s, border-color .15s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: #a7884f;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card h2 {
+      font-size: 21px;
+      letter-spacing: -.025em;
+      line-height: 1.24;
+      margin: 0;
+      color: var(--gold-light);
+      overflow-wrap: anywhere;
+    }
+
+    .pill {
+      color: #f0d49b;
+      background: #5e492a66;
+      border: 1px solid #9c763a70;
+      border-radius: 99px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .enhancements {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 11px;
+    }
+
+    .enh {
+      background: #131622;
+      border: 1px solid #303549;
+      border-radius: 10px;
+      padding: 10px 11px;
+      min-width: 0;
+    }
+
+    .enh small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .enh strong {
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .note {
+      color: #d6d6e2;
+      background: #272b3e;
+      border-left: 3px solid var(--gold);
+      border-radius: 5px;
+      padding: 10px 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .card-footer {
+      border-top: 1px solid var(--edge);
+      padding-top: 13px;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      background: var(--surface);
+      border: 1px dashed var(--edge);
+      border-radius: var(--radius);
+      text-align: center;
+      padding: 46px 20px;
+      color: var(--muted);
+    }
+
+    .empty h2 {
+      color: var(--text);
+      margin: 0 0 8px;
+    }
+
+    /* MODAL */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: #05060bcf;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .modal-backdrop[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: min(640px, 100%);
+      max-height: min(92vh, 850px);
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--edge);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 30px 80px #000a;
+    }
+
+    .modal-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .modal-heading h2 {
+      margin: 0;
+      color: var(--gold-light);
+      font-size: 23px;
+    }
+
+    .modal-heading p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 5px 0 0;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .alert {
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      background: #343043;
+      border: 1px solid #6b557a;
+      color: #ead8f4;
+    }
+
+    .alert[data-kind="error"] {
+      background: #4a2831;
+      border-color: #95505a;
+      color: #ffd1d5;
+    }
+
+    .alert[data-kind="success"] {
+      background: #1e493f;
+      border-color: #34866f;
+      color: #c3ffe5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .footer {
+      padding: 25px 0 35px;
+      text-align: center;
+      border-top: 1px solid var(--edge);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    /* RESPONSIVIDADE */
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .toolbar .field:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .topbar-inner {
+        min-height: 68px;
+      }
+
+      .brand small {
+        display: none;
+      }
+
+      .topbar .btn {
+        font-size: 12px;
+        padding: 9px;
+      }
+
+      .hero {
+        padding: 42px 0 26px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      .toolbar .field:first-child {
+        grid-column: auto;
+      }
+
+      .modal {
+        padding: 18px;
+      }
+
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full {
+        grid-column: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *:before,
+      *:after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-    <header>
-        <h1>AQW Class Builds</h1>
-        <p>Base Comunitária de Encantamentos</p>
-        <div class="header-actions">
-            <button class="btn-suggest" onclick="openModal()">Sugerir uma Build</button>
-        </div>
-    </header>
+  <!-- CABEÇALHO -->
 
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Buscar por classe, função ou autor...">
+  <header class="topbar">
+    <div class="shell topbar-inner">
+
+      <a class="brand" href="#inicio" aria-label="AQW Builds, início">
+        <span class="brand-icon" aria-hidden="true">⚔</span>
+        <span>
+          <strong>AQW BUILDS</strong>
+          <small>Biblioteca comunitária</small>
+        </span>
+      </a>
+
+      <button class="btn btn-primary" id="openSuggest" type="button">
+        + Sugerir build
+      </button>
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+
+  <main id="inicio" class="shell">
+
+    <section class="hero">
+      <div class="eyebrow">AdventureQuest Worlds</div>
+
+      <h1>
+        Encontre sua próxima <span>build.</span>
+      </h1>
+
+      <p>
+        Explore configurações de encantamentos compartilhadas pela comunidade.
+        Filtre por classe e função para encontrar o que procura.
+      </p>
+    </section>
+
+    <!-- FILTROS -->
+
+    <section class="toolbar" aria-label="Filtros do catálogo">
+
+      <div class="field">
+        <label for="searchInput">Pesquisar</label>
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Classe, encantamento, autor..."
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="field">
+        <label for="roleFilter">Função</label>
+        <select id="roleFilter">
+          <option value="">Todas as funções</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="sortBy">Ordenar</label>
+        <select id="sortBy">
+          <option value="name">Classe (A–Z)</option>
+          <option value="name-desc">Classe (Z–A)</option>
+          <option value="role">Função (A–Z)</option>
+        </select>
+      </div>
+
+      <button
+        id="clearFilters"
+        class="btn btn-quiet"
+        type="button"
+      >
+        Limpar filtros
+      </button>
+
+    </section>
+
+    <!-- STATUS E ATUALIZAÇÃO -->
+
+    <div class="meta">
+      <span id="resultCount">Carregando catálogo...</span>
+
+      <div class="btn-row">
+        <span id="statusLine" role="status" aria-live="polite"></span>
+
+        <button id="reloadBtn" class="btn btn-small" type="button">
+          ↻ Atualizar dados
+        </button>
+      </div>
     </div>
 
-    <div id="loading" style="text-align: center; color: var(--gold);">Invocando dados...</div>
-    <div class="grid-container" id="buildsContainer"></div>
+    <!-- CARDS -->
 
-    <div class="modal-overlay" id="suggestModal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeModal(event)">&times;</button>
-            <h2>Enviar Nova Build</h2>
-            
-            <form id="buildForm" onsubmit="submitForm(event)">
-                <div class="form-group">
-                    <label>Classe (Ex: Void Highlord)</label>
-                    <input type="text" id="input_class" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Função (Ex: Farm, Solo, Suporte, PvP)</label>
-                    <input type="text" id="input_funcao" required>
-                </div>
+    <section
+      id="buildsContainer"
+      class="grid"
+      aria-live="polite"
+      aria-label="Builds encontradas"
+    >
+      <div class="empty">Carregando builds...</div>
+    </section>
 
-                <div class="form-group">
-                    <label>Encantamento da Classe (Ex: Luck)</label>
-                    <input type="text" id="input_classEnh" required>
-                </div>
-                <div class="form-group">
-                    <label>Arma (Ex: Valiance)</label>
-                    <input type="text" id="input_weapon" required>
-                </div>
-                <div class="form-group">
-                    <label>Capuz (Ex: Forge)</label>
-                    <input type="text" id="input_helm" required>
-                </div>
-                <div class="form-group">
-                    <label>Capa (Ex: Lament)</label>
-                    <input type="text" id="input_cape" required>
-                </div>
-                <div class="form-group">
-                    <label>Observação / Dica de uso</label>
-                    <textarea id="input_obs" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Seu Nick/Nome</label>
-                    <input type="text" id="input_author" required>
-                </div>
-                
-                <button type="submit" class="btn-suggest" style="width: 100%;">Enviar para Análise</button>
-                <div id="submitStatus"></div>
-            </form>
+  </main>
+
+  <footer class="footer">
+    Catálogo comunitário não oficial de AdventureQuest Worlds.
+    As builds representam contribuições dos jogadores.
+  </footer>
+
+  <!-- MODAL DE SUGESTÃO -->
+
+  <div class="modal-backdrop" id="suggestModal" hidden>
+
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+      aria-describedby="modalDescription"
+    >
+
+      <div class="modal-heading">
+        <div>
+          <h2 id="modalTitle">Sugerir uma build</h2>
+          <p id="modalDescription">
+            Compartilhe uma configuração com a comunidade.
+          </p>
         </div>
+
+        <button
+          class="btn btn-small"
+          id="closeSuggest"
+          type="button"
+          aria-label="Fechar formulário"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form id="buildForm">
+
+        <div class="modal-grid">
+
+          <div class="field">
+            <label for="input_class">Classe *</label>
+            <input
+              id="input_class"
+              required
+              maxlength="90"
+              placeholder="Ex.: Void Highlord"
+            >
+          </div>
+
+          <div class="field">
+            <label for="input_funcao">Função *</label>
+            <input
+              id="input_funcao"
+              required
+              maxlength="50"
+              placeholder="Ex.: Solo"
+            >
+          </div>
+
+          <div class="field">
+            <label for="input_classEnh">Encantamento da classe *</label>
+            <input
+              id="input_classEnh"
+              required
+              maxlength="70"
+              placeholder="Ex.: Luck"
+            >
+          </div>
+
+          <div class="field">
+            <label for="input_weapon">Arma *</label>
+            <input
+              id="input_weapon"
+              required
+              maxlength="70"
+              placeholder="Ex.: Valiance"
+            >
+          </div>
+
+          <div class="field">
+            <label for="input_helm">Capuz *</label>
+            <input
+              id="input_helm"
+              required
+              maxlength="70"
+              placeholder="Ex.: Anima"
+            >
+          </div>
+
+          <div class="field">
+            <label for="input_cape">Capa *</label>
+            <input
+              id="input_cape"
+              required
+              maxlength="70"
+              placeholder="Ex.: Vainglory"
+            >
+          </div>
+
+          <div class="field full">
+            <label for="input_obs">Observação / dica *</label>
+            <textarea
+              id="input_obs"
+              required
+              maxlength="800"
+              placeholder="Explique a aplicação e as alternativas da build."
+            ></textarea>
+          </div>
+
+          <div class="field full">
+            <label for="input_author">Nick / nome do autor *</label>
+            <input
+              id="input_author"
+              required
+              maxlength="70"
+              placeholder="Seu nome na comunidade"
+            >
+          </div>
+
+          <div
+            class="full alert"
+            id="submitStatus"
+            role="status"
+            aria-live="polite"
+          >
+            O formulário está preparado para integração futura com
+            Firebase/Firestore. Nesta versão, sugestões ainda não são enviadas.
+          </div>
+
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" id="clearForm" type="button">
+            Limpar
+          </button>
+
+          <button class="btn btn-primary" id="submitButton" type="submit">
+            Enviar sugestão
+          </button>
+        </div>
+
+      </form>
     </div>
+  </div>
 
-    <script>
-        // Link CSV do Google Sheets
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9UXKRHsFz1G2hrPf591ArVykTdhaG5oU93Jnb43UjK0QIVx_AL6g5lClynkEXPAZhOkyZ2g9B8GYH/pub?output=csv";
-        let allClasses = [];
+  <!-- BIBLIOTECA CSV -->
 
-        window.addEventListener('DOMContentLoaded', () => {
-            Papa.parse(GOOGLE_SHEET_CSV_URL, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    allClasses = results.data.filter(row => row['Class'] && row['Class'].trim() !== "");
-                    document.getElementById('loading').style.display = 'none';
-                    renderCards(allClasses);
-                },
-                error: function(err) {
-                    document.getElementById('loading').innerText = "Erro ao carregar os dados. Verifique o link da folha de cálculo.";
-                    console.error("Erro no PapaParse:", err);
-                }
-            });
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <script>
+    'use strict';
+
+    // CONFIGURAÇÃO GOOGLE SHEETS
+
+    const SHEET_URL =
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vR9UXKRHsFz1G2hrPf591ArVykTdhaG5oU93Jnb43UjK0QIVx_AL6g5lClynkEXPAZhOkyZ2g9B8GYH/pub?output=csv';
+
+    const $ = id => document.getElementById(id);
+
+    const collator = new Intl.Collator('pt-BR', {
+      sensitivity: 'base',
+      numeric: true
+    });
+
+    const state = {
+      builds: [],
+      failed: false,
+      loading: false
+    };
+
+    const clean = value => String(value ?? '').trim();
+
+    // NORMALIZAÇÃO DOS DADOS
+
+    function normalizeRow(row) {
+      const normalized = {};
+
+      for (const [key, value] of Object.entries(row)) {
+        normalized[
+          clean(key)
+            .replace(/^\uFEFF/, '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+        ] = clean(value);
+      }
+
+      const get = (...keys) =>
+        keys.map(k => normalized[k])
+          .find(v => v !== undefined) ?? '';
+
+      return {
+        name: get('class', 'classe'),
+        role: get('funcao', 'role'),
+        classEnh: get(
+          'class enhan',
+          'class enhancement',
+          'encantamento classe'
+        ),
+        weapon: get('weapon', 'arma'),
+        helm: get('helm', 'capuz'),
+        cape: get('cape', 'capa'),
+        note: get('observacao', 'notes'),
+        author: get('autor', 'author')
+      };
+    }
+
+    // CRIAÇÃO SEGURA DOS ELEMENTOS
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+
+      if (className) {
+        node.className = className;
+      }
+
+      if (text !== undefined) {
+        node.textContent = text;
+      }
+
+      return node;
+    }
+
+    function emptyState(title, message) {
+      const box = el('div', 'empty');
+
+      box.append(
+        el('h2', '', title),
+        el('p', '', message)
+      );
+
+      $('buildsContainer').replaceChildren(box);
+    }
+
+    // CRIAÇÃO DOS CARDS
+
+    function makeCard(item) {
+      const card = el('article', 'card');
+      const head = el('div', 'card-head');
+
+      const title = el('h2', '', item.name);
+      const pill = el('span', 'pill', item.role || 'Geral');
+
+      head.append(title, pill);
+      card.append(head);
+
+      const grid = el('div', 'enhancements');
+
+      for (const [label, value] of [
+        ['Classe', item.classEnh],
+        ['Arma', item.weapon],
+        ['Capuz', item.helm],
+        ['Capa', item.cape]
+      ]) {
+        const unit = el('div', 'enh');
+
+        unit.append(
+          el('small', '', label),
+          el('strong', '', value || '—')
+        );
+
+        grid.append(unit);
+      }
+
+      card.append(grid);
+
+      if (item.note) {
+        card.append(el('div', 'note', item.note));
+      }
+
+      const foot = el('div', 'card-footer');
+
+      foot.append(
+        el(
+          'span',
+          '',
+          item.author
+            ? 'Por ' + item.author
+            : 'Autor não informado'
+        )
+      );
+
+      card.append(foot);
+
+      return card;
+    }
+
+    // PESQUISA, FILTROS E ORDENAÇÃO
+
+    function display() {
+      const term = clean(
+        $('searchInput').value
+      ).toLocaleLowerCase('pt-BR');
+
+      const role = $('roleFilter').value;
+      const sort = $('sortBy').value;
+
+      const rows = state.builds.filter(x =>
+        (!role || x.role === role) &&
+        (
+          !term ||
+          [
+            x.name,
+            x.role,
+            x.classEnh,
+            x.weapon,
+            x.helm,
+            x.cape,
+            x.note,
+            x.author
+          ].some(value =>
+            value.toLocaleLowerCase('pt-BR').includes(term)
+          )
+        )
+      );
+
+      rows.sort((a, b) =>
+        sort === 'role'
+          ? collator.compare(a.role, b.role) ||
+            collator.compare(a.name, b.name)
+          : sort === 'name-desc'
+            ? collator.compare(b.name, a.name)
+            : collator.compare(a.name, b.name)
+      );
+
+      $('resultCount').textContent =
+        `${rows.length} ${
+          rows.length === 1
+            ? 'build encontrada'
+            : 'builds encontradas'
+        }${
+          state.builds.length !== rows.length
+            ? ' de ' + state.builds.length
+            : ''
+        }`;
+
+      if (!rows.length) {
+        emptyState(
+          state.failed
+            ? 'Catálogo indisponível'
+            : 'Nenhum resultado',
+
+          state.failed
+            ? 'Não foi possível carregar a planilha. Clique em Atualizar dados.'
+            : 'Tente outra pesquisa ou limpe os filtros.'
+        );
+
+        return;
+      }
+
+      $('buildsContainer').replaceChildren(
+        ...rows.map(makeCard)
+      );
+    }
+
+    // CARREGAMENTO DOS FILTROS DE FUNÇÃO
+
+    function updateRoles() {
+      const selected = $('roleFilter').value;
+
+      const roles = [
+        ...new Set(
+          state.builds.map(x => x.role).filter(Boolean)
+        )
+      ].sort(collator.compare);
+
+      $('roleFilter').replaceChildren(
+        new Option('Todas as funções', ''),
+        ...roles.map(v => new Option(v, v))
+      );
+
+      $('roleFilter').value =
+        roles.includes(selected) ? selected : '';
+    }
+
+    // CARREGAMENTO DOS DADOS
+
+    async function loadBuilds() {
+      if (state.loading) return;
+
+      state.loading = true;
+      state.failed = false;
+
+      $('reloadBtn').disabled = true;
+      $('statusLine').textContent = 'Atualizando...';
+
+      if (!state.builds.length) {
+        emptyState(
+          'Carregando catálogo',
+          'Buscando as configurações na planilha.'
+        );
+      }
+
+      try {
+        if (!window.Papa) {
+          throw new Error('Biblioteca CSV indisponível.');
+        }
+
+        const url = new URL(SHEET_URL);
+
+        url.searchParams.set(
+          '_t',
+          String(Date.now())
+        );
+
+        const response = await fetch(
+          url.toString(),
+          { cache: 'no-store' }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            'Erro HTTP ' + response.status
+          );
+        }
+
+        const csv = await response.text();
+
+        const parsed = Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: 'greedy'
         });
 
-        function renderCards(classesData) {
-            const container = document.getElementById('buildsContainer');
-            container.innerHTML = ""; 
-            
-            if (classesData.length === 0) {
-                container.innerHTML = "<p style='text-align:center; grid-column: 1/-1;'>Nenhuma classe encontrada.</p>";
-                return;
-            }
-
-            classesData.forEach(cls => {
-                const card = document.createElement('div');
-                card.className = 'class-card';
-                
-                const funcao = cls['Função'] || 'Geral';
-                
-                // Variáveis adicionais para garantir que o HTML não quebra
-                const observacaoHTML = cls['Observação'] ? '<div class="notes">💡 ' + cls['Observação'] + '</div>' : '';
-                const autorHTML = cls['Autor'] ? '<div class="author">👤 Autor: ' + cls['Autor'] + '</div>' : '';
-
-                card.innerHTML = `
-                    <h2 class="class-title">${cls['Class']}</h2>
-                    
-                    <div class="role-badge">${funcao}</div>
-
-                    <ul class="enhancement-list">
-                        <li><strong>Class:</strong> ${cls['Class Enhan'] || '-'}</li>
-                        <li><strong>Weapon:</strong> ${cls['Weapon'] || '-'}</li>
-                        <li><strong>Helm:</strong> ${cls['Helm'] || '-'}</li>
-                        <li><strong>Cape:</strong> ${cls['Cape'] || '-'}</li>
-                    </ul>
-                    ${observacaoHTML}
-                    ${autorHTML}
-                `;
-                container.appendChild(card);
-            });
+        if (parsed.errors.some(e => e.type === 'Quotes')) {
+          throw new Error('CSV inválido.');
         }
 
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const filtered = allClasses.filter(cls => 
-                `${cls['Class']} ${cls['Função']} ${cls['Observação']} ${cls['Autor']}`.toLowerCase().includes(searchTerm)
-            );
-            renderCards(filtered);
-        });
-
-        function openModal() {
-            document.getElementById('suggestModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            document.getElementById('submitStatus').style.display = 'none';
+        if (!parsed.meta.fields.some(k =>
+          ['class', 'classe'].includes(
+            clean(k)
+              .replace(/^\uFEFF/, '')
+              .toLowerCase()
+          )
+        )) {
+          throw new Error('Coluna Class não encontrada.');
         }
 
-        function closeModal(event) {
-            if(event) event.stopPropagation();
-            document.getElementById('suggestModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+        const builds = parsed.data
+          .map(normalizeRow)
+          .filter(x => x.name);
+
+        state.builds = builds;
+
+        updateRoles();
+
+        $('statusLine').textContent = 'Dados atualizados';
+
+        display();
+
+      } catch (error) {
+        console.error(
+          'Falha ao carregar builds:',
+          error
+        );
+
+        state.failed = !state.builds.length;
+
+        $('statusLine').textContent = state.failed
+          ? 'Erro no carregamento'
+          : 'Erro ao atualizar; exibindo dados anteriores';
+
+        display();
+
+      } finally {
+        state.loading = false;
+        $('reloadBtn').disabled = false;
+      }
+    }
+
+    // EVENTOS DOS FILTROS
+
+    $('searchInput').addEventListener(
+      'input',
+      display
+    );
+
+    $('roleFilter').addEventListener(
+      'change',
+      display
+    );
+
+    $('sortBy').addEventListener(
+      'change',
+      display
+    );
+
+    $('reloadBtn').addEventListener(
+      'click',
+      loadBuilds
+    );
+
+    $('clearFilters').addEventListener('click', () => {
+      $('searchInput').value = '';
+      $('roleFilter').value = '';
+      $('sortBy').value = 'name';
+
+      display();
+
+      $('searchInput').focus();
+    });
+
+    // CONTROLE DO MODAL
+
+    let previousFocus = null;
+
+    function openModal() {
+      previousFocus = document.activeElement;
+
+      $('suggestModal').hidden = false;
+
+      document.body.classList.add('modal-open');
+
+      $('input_class').focus();
+    }
+
+    function closeModal() {
+      $('suggestModal').hidden = true;
+
+      document.body.classList.remove('modal-open');
+
+      previousFocus?.focus();
+    }
+
+    $('openSuggest').addEventListener(
+      'click',
+      openModal
+    );
+
+    $('closeSuggest').addEventListener(
+      'click',
+      closeModal
+    );
+
+    $('suggestModal').addEventListener('click', event => {
+      if (event.target === $('suggestModal')) {
+        closeModal();
+      }
+    });
+
+    // NAVEGAÇÃO PELO TECLADO
+
+    document.addEventListener('keydown', event => {
+      if ($('suggestModal').hidden) return;
+
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+
+      if (event.key === 'Tab') {
+        const controls = [
+          ...$('suggestModal').querySelectorAll(
+            'button:not(:disabled),input:not(:disabled),textarea:not(:disabled)'
+          )
+        ];
+
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+          event.preventDefault();
+          last.focus();
+
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+          event.preventDefault();
+          first.focus();
         }
+      }
+    });
 
-        function submitForm(event) {
-            event.preventDefault(); 
-            
-            const statusDiv = document.getElementById('submitStatus');
-            statusDiv.style.display = 'block';
-            statusDiv.className = 'status-loading';
-            statusDiv.innerText = 'Enviando sugestão...';
+    // LIMPEZA DO FORMULÁRIO
 
-            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScfsZdbDEOtq1xcbzej_SN0WoGiecnGia710JKdpUb6EpjbYA/formResponse";
+    $('clearForm').addEventListener('click', () => {
+      $('buildForm').reset();
 
-            const formData = new URLSearchParams();
-            
-            // ⚠️ NÃO SE ESQUEÇA: Substitua os entry.111111111 pelos IDs reais gerados no seu formulário
-            formData.append("entry.111111111", document.getElementById('input_class').value);
-            formData.append("entry.NOVO_ID_AQUI", document.getElementById('input_funcao').value);
-            formData.append("entry.222222222", document.getElementById('input_classEnh').value);
-            formData.append("entry.333333333", document.getElementById('input_weapon').value);
-            formData.append("entry.444444444", document.getElementById('input_helm').value);
-            formData.append("entry.555555555", document.getElementById('input_cape').value);
-            formData.append("entry.666666666", document.getElementById('input_obs').value);
-            formData.append("entry.777777777", document.getElementById('input_author').value);
+      $('submitStatus').dataset.kind = '';
 
-            fetch(formURL, {
-                method: "POST",
-                mode: "no-cors", 
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: formData
-            }).then(() => {
-                statusDiv.className = 'status-success';
-                statusDiv.innerText = 'Build enviada com sucesso! Ela será analisada.';
-                document.getElementById('buildForm').reset();
-                setTimeout(() => closeModal(), 3000); 
-            }).catch(error => {
-                statusDiv.className = 'status-error';
-                statusDiv.innerText = 'Erro de conexão. Tente novamente.';
-                console.error('Erro:', error);
-            });
-        }
-    </script>
+      $('submitStatus').textContent =
+        'Campos limpos. O envio será ativado após a integração com o Firestore.';
+
+      $('input_class').focus();
+    });
+
+    // ENVIO DE SUGESTÕES
+    // Integração com Firebase/Firestore ainda pendente.
+
+    $('buildForm').addEventListener('submit', event => {
+      event.preventDefault();
+
+      $('submitStatus').dataset.kind = 'error';
+
+      $('submitStatus').textContent =
+        'O envio ainda não está conectado. Nenhuma sugestão foi registrada. ' +
+        'A integração com Firebase/Firestore será feita na próxima etapa.';
+    });
+
+    // INICIALIZAÇÃO DO CATÁLOGO
+
+    loadBuilds();
+
+  </script>
+
 </body>
 </html>
